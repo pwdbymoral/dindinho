@@ -7,6 +7,17 @@ import eslintConfigPrettier from "eslint-config-prettier";
 
 export default defineConfig([
   {
+    ignores: [
+      "**/node_modules/",
+      "**/dist/",
+      "**/build/",
+      "**/coverage/",
+      "server/prisma/dev.db",
+      "server/prisma/dev.db-journal",
+      ".yarn/",
+    ],
+  },
+  {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
     plugins: { js },
     extends: ["js/recommended"],
