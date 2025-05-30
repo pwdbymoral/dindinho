@@ -20,6 +20,7 @@ model User {
   categories    Category[]
   creditCards   CreditCard[]
   installmentPurchases  InstallmentPurchase[]
+  recurringTransactionRules RecurringTransactionRule[]
 }
 
 model Wallet {
@@ -32,6 +33,8 @@ model Wallet {
 
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade) 
   userId Int  @map("user_id") 
+
+  defaultForRecurringRules RecurringTransactionRule[] @relation("DefaultWalletForRule")
 }
 
 model Category {
@@ -46,6 +49,7 @@ model Category {
   userId Int?  @map("user_id")
 
   installmentPurchases InstallmentPurchase[] 
+  defaultForRecurringRules RecurringTransactionRule[] @relation("DefaultCategoryForRule") 
 }
 
 model CreditCard {
@@ -64,6 +68,7 @@ model CreditCard {
   userId Int  @map("user_id") 
 
   installmentPurchases InstallmentPurchase[] 
+  defaultForRecurringRules RecurringTransactionRule[] @relation("DefaultCreditCardForRule")
 }
 
 model InstallmentPurchase {
@@ -88,3 +93,38 @@ model InstallmentPurchase {
   category  Category   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   categoryId Int        @map("category_id")
 }
+
+enum RecurrenceType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+model RecurringTransactionRule {
+  id                      Int       @id @default(autoincrement())
+  description             String    
+  default_amount          Decimal?  @map("default_amount") 
+  is_amount_variable      Boolean   @default(false) @map("is_amount_variable")
+  recurrence_type         RecurrenceType @map("recurrence_type")
+  recurrence_interval     Int       @map("recurrence_interval") 
+  start_date              DateTime  
+  end_date                DateTime? 
+  next_due_date           DateTime  @map("next_due_date") 
+  is_active               Boolean   @default(true) @map("is_active")
+
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                Int      @map("user_id")
+
+  defaultCategory       Category @relation("DefaultCategoryForRule", fields: [defaultCategoryId], references: [id], onDelete: Restrict)
+  defaultCategoryId     Int      @map("default_category_id")
+
+  defaultWallet         Wallet?  @relation("DefaultWalletForRule", fields: [defaultWalletId], references: [id], onDelete: SetNull)
+  defaultWalletId       Int?     @map("default_wallet_id")
+
+  defaultCreditCard     CreditCard? @relation("DefaultCreditCardForRule", fields: [defaultCreditCardId], references: [id], onDelete: SetNull)
+  defaultCreditCardId   Int?        @map("default_credit_card_id")
+  }
