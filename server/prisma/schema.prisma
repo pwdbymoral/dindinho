@@ -15,4 +15,18 @@ model User {
   password_hash String   @map("password_hash")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
+
+  wallets       Wallet[]
+}
+
+model Wallet {
+  id              Int      @id @default(autoincrement())
+  name            String
+  type            String   
+  initial_balance Decimal  @default(0) @map("initial_balance")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade) 
+  userId Int  @map("user_id") 
 }
