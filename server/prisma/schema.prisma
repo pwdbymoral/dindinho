@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite" // Usamos sqlite aqui porque o Turso é compatível e o Prisma gera SQL para ele
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -18,6 +18,7 @@ model User {
 
   wallets       Wallet[]
   categories    Category[]
+  creditCards   CreditCard[]
 }
 
 model Wallet {
@@ -42,4 +43,20 @@ model Category {
 
   user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId Int?  @map("user_id")
+}
+
+model CreditCard {
+  id               Int       @id @default(autoincrement())
+  name             String    
+  limit            Decimal   
+  due_day          Int       
+  closing_day      Int       
+  brand            String?   
+  last_four_digits String?   @map("last_four_digits") 
+
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id") 
 }
