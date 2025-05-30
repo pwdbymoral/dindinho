@@ -4,9 +4,12 @@
  * Module dependencies.
  */
 
-const app = require('../app');
-const debug = require('debug')('server:server');
-const http = require('http');
+import app from './app.js';
+import Debug from 'debug';
+import http from 'http';
+import { AddressInfo } from 'net';
+
+const debug = Debug('dindinho:server');
 
 /**
  * Get port from environment and store in Express.
@@ -19,7 +22,7 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-const server = http.createServer(app);
+const server: http.Server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -33,17 +36,17 @@ server.on('listening', onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
-  const port = parseInt(val, 10);
+function normalizePort(val: string): number | string | false {
+  const parsedPort = parseInt(val, 10);
 
-  if (isNaN(port)) {
+  if (isNaN(parsedPort)) {
     // named pipe
     return val;
   }
 
-  if (port >= 0) {
+  if (parsedPort >= 0) {
     // port number
-    return port;
+    return parsedPort;
   }
 
   return false;
@@ -53,7 +56,7 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
+function onError(error: NodeJS.ErrnoException): void {
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -79,8 +82,16 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening() {
+function onListening(): void {
   const addr = server.address();
-  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+  let bind: string;
+
+  if (addr === null) {
+    bind = 'unknown pipe or port';
+  } else if (typeof addr === 'string') {
+    bind = 'pipe ' + addr;
+  } else {
+    bind = 'port ' + (addr as AddressInfo).port;
+  }
   debug('Listening on ' + bind);
 }

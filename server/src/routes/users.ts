@@ -1,9 +1,10 @@
-var express = require('express');
-var router = express.Router();
+import express, { Request, Response, NextFunction, Router } from 'express';
 
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.send('respond with a resource');
+const router: Router = express.Router();
+
+// GET home page
+router.get('/', (req: Request, res: Response, next: NextFunction) => {
+  res.send('respondendo com um recurso de usuários!');
 });
 
-module.exports = router;
+export default router;
