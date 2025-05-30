@@ -1,0 +1,15 @@
+**/node_modules
+**/dist
+**/build
+**/coverage
+.yarn/
+yarn.lock
+package-lock.json
+.env
+.env.*
+*.sqlite
+*.db
+*.db-journal
+*.sql
+*.log
+
