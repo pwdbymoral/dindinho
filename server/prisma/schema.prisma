@@ -19,6 +19,7 @@ model User {
   wallets       Wallet[]
   categories    Category[]
   creditCards   CreditCard[]
+  installmentPurchases  InstallmentPurchase[]
 }
 
 model Wallet {
@@ -43,6 +44,8 @@ model Category {
 
   user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId Int?  @map("user_id")
+
+  installmentPurchases InstallmentPurchase[] 
 }
 
 model CreditCard {
@@ -59,4 +62,29 @@ model CreditCard {
 
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id") 
+
+  installmentPurchases InstallmentPurchase[] 
+}
+
+model InstallmentPurchase {
+  id                         Int      @id @default(autoincrement())
+  description                String
+  total_amount               Decimal  @map("total_amount")
+  number_of_installments     Int      @map("number_of_installments")
+  purchase_date              DateTime 
+  first_installment_bill_month Int      @map("first_installment_bill_month") 
+  first_installment_bill_year  Int      @map("first_installment_bill_year")  
+  notes                      String?  
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @map("user_id")
+
+  creditCard CreditCard @relation(fields: [creditCardId], references: [id], onDelete: Restrict)
+  creditCardId Int      @map("credit_card_id")
+
+  category  Category   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId Int        @map("category_id")
 }
