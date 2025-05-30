@@ -17,6 +17,7 @@ model User {
   updatedAt     DateTime @updatedAt @map("updated_at")
 
   wallets       Wallet[]
+  categories    Category[]
 }
 
 model Wallet {
@@ -29,4 +30,16 @@ model Wallet {
 
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade) 
   userId Int  @map("user_id") 
+}
+
+model Category {
+  id                 Int       @id @default(autoincrement())
+  name               String    
+  type               String?   
+  is_system_category Boolean   @default(false) @map("is_system_category")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId Int?  @map("user_id")
 }
