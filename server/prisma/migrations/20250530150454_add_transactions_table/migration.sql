@@ -1,0 +1,27 @@
+-- CreateTable
+CREATE TABLE "Transaction" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "description" TEXT NOT NULL,
+    "amount" DECIMAL NOT NULL,
+    "type" TEXT NOT NULL,
+    "date" DATETIME NOT NULL,
+    "payment_date" DATETIME,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "notes" TEXT,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "category_id" INTEGER NOT NULL,
+    "source_wallet_id" INTEGER,
+    "destination_wallet_id" INTEGER,
+    "credit_card_id" INTEGER,
+    "installment_purchase_id" INTEGER,
+    "recurring_rule_id" INTEGER,
+    CONSTRAINT "Transaction_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Transaction_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "Category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Transaction_source_wallet_id_fkey" FOREIGN KEY ("source_wallet_id") REFERENCES "Wallet" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Transaction_destination_wallet_id_fkey" FOREIGN KEY ("destination_wallet_id") REFERENCES "Wallet" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Transaction_credit_card_id_fkey" FOREIGN KEY ("credit_card_id") REFERENCES "CreditCard" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Transaction_installment_purchase_id_fkey" FOREIGN KEY ("installment_purchase_id") REFERENCES "InstallmentPurchase" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Transaction_recurring_rule_id_fkey" FOREIGN KEY ("recurring_rule_id") REFERENCES "RecurringTransactionRule" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
