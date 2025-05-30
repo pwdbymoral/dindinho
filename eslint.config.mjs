@@ -1,49 +1,81 @@
-import js from "@eslint/js";
-import globals from "globals";
-import tseslint from "typescript-eslint";
-import json from "@eslint/json";
-import { defineConfig } from "eslint/config";
-import eslintConfigPrettier from "eslint-config-prettier";
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import eslintJs from '@eslint/js'; // Para regras base de JavaScript
+import eslintConfigPrettier from 'eslint-config-prettier';
 
-export default defineConfig([
+export default [
+  // 1. Configuração de Ignores Globais
   {
     ignores: [
-      "**/node_modules/",
-      "**/dist/",
-      "**/build/",
-      "**/coverage/",
-      "server/prisma/dev.db",
-      "server/prisma/dev.db-journal",
-      ".yarn/",
+      '**/node_modules/',
+      '**/dist/',
+      '**/build/',
+      '**/coverage/',
+      'server/prisma/dev.db',
+      'server/prisma/dev.db-journal',
+      '.yarn/',
+      '**/package-lock.json',
+      '**/tsconfig*.json',
     ],
   },
+
+  // 2. Configuração base para arquivos JavaScript
   {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
-    plugins: { js },
-    extends: ["js/recommended"],
+    files: ['**/*.{js,mjs,cjs}'], // Somente para arquivos JavaScript
+    rules: {
+      ...eslintJs.configs.recommended.rules,
+      'no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module', // Default para ESM para JS
+      globals: {
+        ...globals.node, // Default para Node.js para arquivos JS na raiz/server
+      },
+    },
   },
+
+  // 3. Configuração específica e principal para arquivos TypeScript
   {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
-    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    files: ['**/*.{ts,tsx,mts,cts}'], // Somente para arquivos TypeScript
+    languageOptions: {
+      parser: tseslint.parser, // Usa o parser do TypeScript
+      parserOptions: {
+        project: [
+          './client/tsconfig.app.json',
+          './client/tsconfig.node.json',
+          './server/tsconfig.json',
+        ], // Habilita regras que usam informação de tipo
+      },
+      globals: {
+        ...globals.browser, // Para o client
+        ...globals.node, // Para o server
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin, // Registra o plugin TypeScript
+    },
+    rules: {
+      ...tseslint.configs.recommended.rules,
+      ...tseslint.configs.recommendedTypeChecked.rules,
+      ...tseslint.configs.stylisticTypeChecked.rules,
+
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+    },
   },
-  tseslint.configs.recommended,
-  {
-    files: ["**/*.json"],
-    plugins: { json },
-    language: "json/json",
-    extends: ["json/recommended"],
-  },
-  {
-    files: ["**/*.jsonc"],
-    plugins: { json },
-    language: "json/jsonc",
-    extends: ["json/recommended"],
-  },
-  {
-    files: ["**/*.json5"],
-    plugins: { json },
-    language: "json/json5",
-    extends: ["json/recommended"],
-  },
+
+  // 4. Configuração do Prettier
   eslintConfigPrettier,
-]);
+];
