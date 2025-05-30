@@ -16,82 +16,89 @@ model User {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  wallets       Wallet[]
-  categories    Category[]
-  creditCards   CreditCard[]
-  installmentPurchases  InstallmentPurchase[]
+  wallets                   Wallet[]
+  categories                Category[]
+  creditCards               CreditCard[]
+  installmentPurchases      InstallmentPurchase[]
   recurringTransactionRules RecurringTransactionRule[]
+  transactions              Transaction[]
 }
 
 model Wallet {
   id              Int      @id @default(autoincrement())
   name            String
-  type            String   
+  type            String
   initial_balance Decimal  @default(0) @map("initial_balance")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade) 
-  userId Int  @map("user_id") 
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
 
   defaultForRecurringRules RecurringTransactionRule[] @relation("DefaultWalletForRule")
+  sourceTransactions       Transaction[]              @relation("SourceWalletTransactions")
+  destinationTransactions  Transaction[]              @relation("DestinationWalletTransactions")
 }
 
 model Category {
-  id                 Int       @id @default(autoincrement())
-  name               String    
-  type               String?   
-  is_system_category Boolean   @default(false) @map("is_system_category")
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
+  id                 Int      @id @default(autoincrement())
+  name               String
+  type               String?
+  is_system_category Boolean  @default(false) @map("is_system_category")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
   user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId Int?  @map("user_id")
 
-  installmentPurchases InstallmentPurchase[] 
-  defaultForRecurringRules RecurringTransactionRule[] @relation("DefaultCategoryForRule") 
+  installmentPurchases     InstallmentPurchase[]
+  defaultForRecurringRules RecurringTransactionRule[] @relation("DefaultCategoryForRule")
+  transactions             Transaction[]
 }
 
 model CreditCard {
-  id               Int       @id @default(autoincrement())
-  name             String    
-  limit            Decimal   
-  due_day          Int       
-  closing_day      Int       
-  brand            String?   
-  last_four_digits String?   @map("last_four_digits") 
-
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int  @map("user_id") 
-
-  installmentPurchases InstallmentPurchase[] 
-  defaultForRecurringRules RecurringTransactionRule[] @relation("DefaultCreditCardForRule")
-}
-
-model InstallmentPurchase {
-  id                         Int      @id @default(autoincrement())
-  description                String
-  total_amount               Decimal  @map("total_amount")
-  number_of_installments     Int      @map("number_of_installments")
-  purchase_date              DateTime 
-  first_installment_bill_month Int      @map("first_installment_bill_month") 
-  first_installment_bill_year  Int      @map("first_installment_bill_year")  
-  notes                      String?  
+  id               Int     @id @default(autoincrement())
+  name             String
+  limit            Decimal
+  due_day          Int
+  closing_day      Int
+  brand            String?
+  last_four_digits String? @map("last_four_digits")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int      @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
 
-  creditCard CreditCard @relation(fields: [creditCardId], references: [id], onDelete: Restrict)
-  creditCardId Int      @map("credit_card_id")
+  installmentPurchases     InstallmentPurchase[]
+  defaultForRecurringRules RecurringTransactionRule[] @relation("DefaultCreditCardForRule")
+  transactions             Transaction[]
+}
 
-  category  Category   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  categoryId Int        @map("category_id")
+model InstallmentPurchase {
+  id                           Int      @id @default(autoincrement())
+  description                  String
+  total_amount                 Decimal  @map("total_amount")
+  number_of_installments       Int      @map("number_of_installments")
+  purchase_date                DateTime
+  first_installment_bill_month Int      @map("first_installment_bill_month")
+  first_installment_bill_year  Int      @map("first_installment_bill_year")
+  notes                        String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
+
+  creditCard   CreditCard @relation(fields: [creditCardId], references: [id], onDelete: Restrict)
+  creditCardId Int        @map("credit_card_id")
+
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId Int      @map("category_id")
+
+  transactions Transaction[]
 }
 
 enum RecurrenceType {
@@ -102,29 +109,78 @@ enum RecurrenceType {
 }
 
 model RecurringTransactionRule {
-  id                      Int       @id @default(autoincrement())
-  description             String    
-  default_amount          Decimal?  @map("default_amount") 
-  is_amount_variable      Boolean   @default(false) @map("is_amount_variable")
-  recurrence_type         RecurrenceType @map("recurrence_type")
-  recurrence_interval     Int       @map("recurrence_interval") 
-  start_date              DateTime  
-  end_date                DateTime? 
-  next_due_date           DateTime  @map("next_due_date") 
-  is_active               Boolean   @default(true) @map("is_active")
+  id                  Int            @id @default(autoincrement())
+  description         String
+  default_amount      Decimal?       @map("default_amount")
+  is_amount_variable  Boolean        @default(false) @map("is_amount_variable")
+  recurrence_type     RecurrenceType @map("recurrence_type")
+  recurrence_interval Int            @map("recurrence_interval")
+  start_date          DateTime
+  end_date            DateTime?
+  next_due_date       DateTime       @map("next_due_date")
+  is_active           Boolean        @default(true) @map("is_active")
 
-  createdAt               DateTime  @default(now()) @map("created_at")
-  updatedAt               DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId                Int      @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
 
-  defaultCategory       Category @relation("DefaultCategoryForRule", fields: [defaultCategoryId], references: [id], onDelete: Restrict)
-  defaultCategoryId     Int      @map("default_category_id")
+  defaultCategory   Category @relation("DefaultCategoryForRule", fields: [defaultCategoryId], references: [id], onDelete: Restrict)
+  defaultCategoryId Int      @map("default_category_id")
 
-  defaultWallet         Wallet?  @relation("DefaultWalletForRule", fields: [defaultWalletId], references: [id], onDelete: SetNull)
-  defaultWalletId       Int?     @map("default_wallet_id")
+  defaultWallet   Wallet? @relation("DefaultWalletForRule", fields: [defaultWalletId], references: [id], onDelete: SetNull)
+  defaultWalletId Int?    @map("default_wallet_id")
 
-  defaultCreditCard     CreditCard? @relation("DefaultCreditCardForRule", fields: [defaultCreditCardId], references: [id], onDelete: SetNull)
-  defaultCreditCardId   Int?        @map("default_credit_card_id")
-  }
+  defaultCreditCard   CreditCard? @relation("DefaultCreditCardForRule", fields: [defaultCreditCardId], references: [id], onDelete: SetNull)
+  defaultCreditCardId Int?        @map("default_credit_card_id")
+
+  transactions Transaction[] @relation("GeneratedFromRule")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum TransactionStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+model Transaction {
+  id           Int               @id @default(autoincrement())
+  description  String
+  amount       Decimal
+  type         TransactionType
+  date         DateTime
+  payment_date DateTime?         @map("payment_date")
+  status       TransactionStatus @default(PENDING) @map("status")
+  notes        String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
+
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId Int      @map("category_id")
+
+  sourceWallet   Wallet? @relation("SourceWalletTransactions", fields: [sourceWalletId], references: [id], onDelete: SetNull)
+  sourceWalletId Int?    @map("source_wallet_id")
+
+  destinationWallet   Wallet? @relation("DestinationWalletTransactions", fields: [destinationWalletId], references: [id], onDelete: SetNull)
+  destinationWalletId Int?    @map("destination_wallet_id")
+
+  creditCard   CreditCard? @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
+  creditCardId Int?        @map("credit_card_id")
+
+  installmentPurchase   InstallmentPurchase? @relation(fields: [installmentPurchaseId], references: [id], onDelete: Cascade)
+  installmentPurchaseId Int?                 @map("installment_purchase_id")
+
+  recurringTransactionRule RecurringTransactionRule? @relation("GeneratedFromRule", fields: [recurringRuleId], references: [id], onDelete: SetNull)
+  recurringRuleId          Int?                      @map("recurring_rule_id")
+}
