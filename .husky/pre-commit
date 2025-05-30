@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# O comando que queremos rodar antes de cada commit:
+npx lint-staged

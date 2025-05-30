@@ -1,7 +1,12 @@
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import eslintJs from '@eslint/js'; // Para regras base de JavaScript
 import eslintConfigPrettier from 'eslint-config-prettier';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default [
   // 1. Configuração de Ignores Globais
@@ -49,6 +54,7 @@ export default [
           './client/tsconfig.node.json',
           './server/tsconfig.json',
         ], // Habilita regras que usam informação de tipo
+        tsconfigRootDir: __dirname, // Define o diretório raiz do tsconfig
       },
       globals: {
         ...globals.browser, // Para o client
