@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node ./dist/server.js",
     "build": "tsc",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'node --loader ts-node/esm src/server.ts'"
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'node --loader ts-node/esm src/server.ts'",
+    "prisma:seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "6.8.2",
