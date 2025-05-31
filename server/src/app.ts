@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction, Application } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import morganLogger from 'morgan';
+import session from 'express-session';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -12,6 +13,7 @@ const __dirname_esm = dirname(__filename);
 
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
+import authRouter from './routes/auth.js';
 
 const app: Application = express();
 
@@ -23,10 +25,23 @@ app.use(morganLogger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'seuSegredoDeSessaoTemporario',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+      httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+      maxAge: 1000 * 60 * 60 * 24, // 1 dia em milissegundos
+    },
+  })
+);
 app.use(express.static(path.join(__dirname_esm, '../public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/api/auth', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function (_req: Request, _res: Response, next: NextFunction) {
