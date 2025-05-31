@@ -7,10 +7,13 @@
     "start": "node ./dist/server.js",
     "build": "tsc",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'node --loader ts-node/esm src/server.ts'",
-    "prisma:seed": "ts-node prisma/seed.ts"
+    "prisma:seed": "node -r dotenv/config --loader ts-node/esm prisma/seed.ts"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.8",
+    "@prisma/adapter-libsql": "^6.8.2",
     "@prisma/client": "6.8.2",
+    "bcryptjs": "^3.0.2",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "^4.19.2",
@@ -19,12 +22,14 @@
     "pug": "^3.0.3"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/cookie-parser": "^1.4.8",
     "@types/debug": "^4.1.12",
     "@types/express": "^5.0.2",
     "@types/http-errors": "^2.0.4",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.15.28",
+    "dotenv": "^16.5.0",
     "nodemon": "^3.1.10",
     "prisma": "^6.8.2",
     "ts-node": "^10.9.2",
