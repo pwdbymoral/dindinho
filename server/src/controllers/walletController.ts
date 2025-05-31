@@ -70,7 +70,30 @@ export const createWallet = async (
   }
 };
 
-// TODO: Implementar getWallets
+export const getWallets = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.session.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Usuário não autenticado.' });
+    }
+    const wallets = await prisma.wallet.findMany({
+      where: {
+        userId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return res.status(200).json(wallets);
+  } catch (error) {
+    next(error);
+  }
+};
 // TODO: Implementar getWalletById
 // TODO: Implementar updateWallet
 // TODO: Implementar deleteWallet
