@@ -1,9 +1,8 @@
-import express, { Router, Request, Response, NextFunction } from 'express';
+import express, { Router } from 'express';
+import { login } from '../controllers/authController.js';
 
 const router: Router = express.Router();
 
-router.post('/login', (req: Request, res: Response, next: NextFunction) => {
-  res.status(501).json({ message: 'Endpoint de login ainda não implementado' });
-});
+router.post('/login', login);
 
 export default router;
