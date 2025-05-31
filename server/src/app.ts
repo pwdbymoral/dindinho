@@ -11,6 +11,7 @@ import { dirname } from 'path';
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 import authRouter from './routes/auth.js';
+import walletRouter from './routes/walletRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname_esm = dirname(__filename);
@@ -46,6 +47,7 @@ app.use(express.static(path.join(__dirname_esm, '../public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/wallets', walletRouter);
 
 // Catch 404 and forward to error handler
 app.use((_req: Request, _res: Response, next: NextFunction) => {
