@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./dist/server.js",
     "build": "tsc",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'node --loader ts-node/esm src/server.ts'",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'node -r dotenv/config --loader ts-node/esm src/server.ts'",
     "prisma:seed": "node -r dotenv/config --loader ts-node/esm prisma/seed.ts"
   },
   "dependencies": {

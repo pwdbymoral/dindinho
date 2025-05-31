@@ -1,65 +1,61 @@
+// server/src/app.ts
 import createError, { HttpError } from 'http-errors';
 import express, { Request, Response, NextFunction, Application } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import morganLogger from 'morgan';
-import session from 'express-session';
-
+import session, { SessionOptions } from 'express-session';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname_esm = dirname(__filename);
 
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 import authRouter from './routes/auth.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname_esm = dirname(__filename);
+
 const app: Application = express();
 
-// view engine setup
+// View engine setup
 app.set('views', path.join(__dirname_esm, '../views'));
 app.set('view engine', 'pug');
 
+// Middlewares
 app.use(morganLogger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'seuSegredoDeSessaoTemporario',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-      httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-      maxAge: 1000 * 60 * 60 * 24, // 1 dia em milissegundos
-    },
-  })
-);
+
+const sessionOptions: SessionOptions = {
+  secret: process.env.SESSION_SECRET || 'fallbackSuperSecretTemporarioParaDev',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24,
+  },
+};
+const sessionMiddleware = session(sessionOptions);
+app.use(sessionMiddleware);
+
 app.use(express.static(path.join(__dirname_esm, '../public')));
 
+// Montar as rotas
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/auth', authRouter);
 
-// catch 404 and forward to error handler
-app.use(function (_req: Request, _res: Response, next: NextFunction) {
+// Catch 404 and forward to error handler
+app.use((_req: Request, _res: Response, next: NextFunction) => {
   next(createError(404));
 });
 
-// error handler
-app.use(function (
-  err: HttpError,
-  req: Request,
-  res: Response,
-  _next: NextFunction
-) {
-  // set locals, only providing error in development
+// Error handler
+app.use((err: HttpError, req: Request, res: Response, _next: NextFunction) => {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
