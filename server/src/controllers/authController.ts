@@ -68,3 +68,14 @@ export const login = async (
     next(error);
   }
 };
+
+export const logoutUser = (req: Request, res: Response, next: NextFunction) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Erro ao destruir a sessão:', err);
+      return next(err);
+    }
+    res.clearCookie('connect.sid', { path: '/' });
+    return res.status(200).json({ message: 'Logout realizado com sucesso.' });
+  });
+};
