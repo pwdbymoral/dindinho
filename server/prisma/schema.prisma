@@ -54,6 +54,8 @@ model Category {
   installmentPurchases     InstallmentPurchase[]
   defaultForRecurringRules RecurringTransactionRule[] @relation("DefaultCategoryForRule")
   transactions             Transaction[]
+
+  @@unique([name, is_system_category])
 }
 
 model CreditCard {
