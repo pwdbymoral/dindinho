@@ -79,3 +79,45 @@ export const logoutUser = (req: Request, res: Response, next: NextFunction) => {
     return res.status(200).json({ message: 'Logout realizado com sucesso.' });
   });
 };
+
+export const getAuthStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.session.userId;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ message: 'Não autorizado ou sessão inválida.' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        username: true,
+      },
+    });
+
+    if (!user) {
+      return req.session.destroy((err) => {
+        if (err) {
+          return next(err);
+        }
+        res.clearCookie('connect.sid', { path: '/' });
+        return res.status(401).json({
+          message: 'Usuário da sessão não encontrado. Sessão encerrada.',
+        });
+      });
+    }
+
+    return res.status(200).json({ user });
+  } catch (error) {
+    next(error);
+  }
+};
