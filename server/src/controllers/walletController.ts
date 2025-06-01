@@ -94,6 +94,39 @@ export const getWallets = async (
     next(error);
   }
 };
-// TODO: Implementar getWalletById
+
+export const getWalletById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.session.userId;
+    const walletId = parseInt(req.params.id, 10);
+
+    if (isNaN(walletId)) {
+      return res.status(400).json({ message: 'ID da carteira inválido.' });
+    }
+    if (!userId) {
+      return res.status(401).json({ message: 'Usuário não autenticado.' });
+    }
+    const wallet = await prisma.wallet.findUnique({
+      where: {
+        id: walletId,
+        userId: userId,
+      },
+    });
+    if (!wallet) {
+      return res.status(404).json({
+        message: 'Carteira não encontrada ou não pertence ao usuário.',
+      });
+    }
+
+    return res.status(200).json(wallet);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // TODO: Implementar updateWallet
 // TODO: Implementar deleteWallet
