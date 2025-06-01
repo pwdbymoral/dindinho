@@ -128,5 +128,82 @@ export const getWalletById = async (
   }
 };
 
-// TODO: Implementar updateWallet
+interface UpdateWalletBody {
+  name?: string;
+  type?: string;
+  initial_balance?: number;
+}
+
+export const updateWallet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.session.userId;
+    const walletId = parseInt(req.params.id, 10);
+    const { name, type, initial_balance }: UpdateWalletBody = req.body;
+
+    if (isNaN(walletId)) {
+      return res.status(400).json({ message: 'ID da carteira inválido.' });
+    }
+
+    if (
+      name === undefined &&
+      type === undefined &&
+      initial_balance === undefined
+    ) {
+      return res
+        .status(400)
+        .json({ message: 'Nenhum dado fornecido para atualização.' });
+    }
+
+    if (
+      initial_balance !== undefined &&
+      (typeof initial_balance !== 'number' || isNaN(initial_balance))
+    ) {
+      return res
+        .status(400)
+        .json({ message: 'Saldo inicial deve ser um número válido.' });
+    }
+
+    const existingWallet = await prisma.wallet.findUnique({
+      where: { id: walletId },
+    });
+
+    if (!existingWallet) {
+      return res.status(404).json({ message: 'Carteira nao encontrada.' });
+    }
+
+    if (existingWallet.userId !== userId) {
+      return res
+        .status(403)
+        .json({ message: 'Acesso negado: esta carteira não pertence a você.' });
+    }
+
+    const dataToUpdate: {
+      name?: string;
+      type?: string;
+      initial_balance?: number;
+    } = {};
+
+    if (name !== undefined) {
+      dataToUpdate.name = name;
+    }
+    if (type !== undefined) {
+      dataToUpdate.type = type;
+    }
+    if (initial_balance !== undefined) {
+      dataToUpdate.initial_balance = initial_balance;
+    }
+
+    const updatedWallet = await prisma.wallet.update({
+      where: { id: walletId },
+      data: dataToUpdate,
+    });
+    return res.status(200).json(updatedWallet);
+  } catch (error) {
+    next(error);
+  }
+};
 // TODO: Implementar deleteWallet
