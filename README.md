@@ -17,58 +17,110 @@ Este projeto visa criar uma solução intuitiva e eficiente para o controle fina
   - Backend: Vercel (Serverless Functions)
   - Banco de Dados: Turso (Tier Gratuito)
 
-## 🎯 Escopo do MVP (Versão Alpha)
+## 🗺️ Roadmap MVP
 
-Foco inicial em fornecer uma solução funcional e gratuita para os dois usuários alpha testers.
+`(Atualizado em 01/Jun/2025)`
 
-### 1. Gerenciamento de Usuários
+**Status Atual**: Backend com autenticação base, seed de dados, e CRUD de Carteiras completo e funcional! APIs de Cartões de Crédito e Categorias são os próximos alvos.
 
-- Cadastro restrito aos dois usuários alpha (pré-cadastro via script/seeding).
-- Login seguro (permitindo login por username ou email).
+✅ Fase 0: Fundação e Configuração (Concluída)
 
-### 2. Funcionalidades Financeiras Essenciais
+- [✅] Definição do Escopo do MVP
+- [✅] Modelagem Conceitual do Banco de Dados
+- [✅] Configuração do Monorepo (Yarn Workspaces)
+- [✅] Setup Inicial do Backend (Express.js)
+- [✅] Migração Completa do Backend para TypeScript e Módulos ES
+- [✅] Configuração do ORM (Prisma)
+- [✅] Definição do Schema Completo do Banco de Dados no Prisma (User, Wallet, Category, CreditCard, InstallmentPurchase, RecurringTransactionRule, Transaction, Enums)
+- [✅] Configuração e Integração com Banco de Dados na Nuvem (Turso)
+- [✅] Criação e Aplicação de Todas as Migrações do Schema no Turso
+- [✅] Configuração de Ferramentas de Qualidade de Código na Raiz (ESLint, Prettier)
+  - [✅] Integração eslint-config-prettier
+  - [✅] Configuração parserOptions.project e tsconfigRootDir para linting de TS no monorepo.
+  - [✅] Plugin prettier-plugin-prisma.
+- [✅] Configuração de ESLint Específico por Workspace (client e server) herdando da raiz.
+- [✅] Configuração de Hooks de Pré-Commit (Husky + lint-staged).
+- [✅] Remediação de Vulnerabilidades Iniciais (Jade para Pug, atualização do Express)
 
-- **Carteiras (Wallets)**:
-  - Criação e gerenciamento (ex: dinheiro, conta corrente, poupança).
-  - Definição de saldo inicial.
-  - Associação ao usuário titular.
-- **Cartões de Crédito (Credit Cards)**:
-  - Cadastro com nome, limite, dia de vencimento e fechamento da fatura.
-  - Associação ao usuário titular.
-- **Categorias (Categories)**:
-  - Categorias padrão do sistema e personalizadas pelo usuário.
-  - Tipos de categoria ('income', 'expense', ou NULO para categorias de sistema).
-  - Categoria especial de sistema para "Transferências Internas".
-- **Transações (Transactions)**:
-  - Registro de receitas, despesas e transferências.
-  - Campos para origem (`source_wallet_id`) e destino (`destination_wallet_id`, `credit_card_id`) para clareza nas movimentações.
-  - Associação com categorias (obrigatória, usando categoria de sistema para transferências).
-  - Status: `PENDING` (ex: conta a pagar, receita a receber), `PAID` (paga/realizada), `CANCELLED`.
-  - Suporte a data da transação e data do pagamento/efetivação.
-- **Compras Parceladas (Installment Purchases)**:
-  - Registro de compras feitas no cartão de crédito de forma parcelada.
-  - Definição do valor total, número de parcelas, data da compra.
-  - Permite ao usuário definir/ajustar o mês/ano da primeira fatura.
-  - Gera transações individuais para cada parcela.
-- **Transações Recorrentes (Automáticas para Previsão - Opção A)**:
-  - Definição de regras para despesas/receitas recorrentes (Netflix, conta de luz, salário).
-  - Indicador se o valor é fixo ou variável (`is_amount_variable`).
-  - Para valores variáveis, permite um `default_amount` como estimativa (opcional).
-  - Sistema gera automaticamente instâncias futuras de transações (status `PENDING`) com base nas regras, para fins de previsão financeira.
-  - Usuário edita o valor (se variável) e marca como `PAID` quando a transação se concretiza.
-- **Contas Compartilhadas (MVP Inicial)**:
-  - Foco em uma visão totalmente compartilhada entre os dois usuários alpha (toda informação visível para ambos).
-  - Atributos de "propriedade" (`user_id`) em carteiras, cartões, regras recorrentes, etc., para identificar o titular/criador principal.
-  - Categorias personalizadas criadas por um membro são visíveis/utilizáveis por ambos no contexto compartilhado.
-- **Reembolsos (Refunds - Simplificado)**:
-  - Registrados como transações de `income`.
-  - Para reembolsos parcelados, o usuário registra múltiplas transações de `income` manualmente.
+⏳ Fase 1: Backend - API Core, Autenticação e Setup de Implantação do Backend
 
-### 3. Visualização de Dados (Básico)
+- Autenticação de Usuário:
+  - [✅] Implementar hashing de senhas (bcryptjs)
+  - [✅] Criar endpoint de Login (POST /api/auth/login)
+  - [✅] Implementar gerenciamento de sessão (express-session)
+  - [✅] Middleware de proteção de rotas autenticadas (isAuthenticated)
+  - [✅] Endpoint de Logout (POST /api/auth/logout)
+  - [✅] Endpoint de Status da Autenticação (GET /api/auth/status)
+- Seed de Dados Iniciais (via Prisma Seed):
+  - [✅] Script Prisma Seed para usuários alpha e categorias de sistema.
+- APIs Base (CRUDs):
+  - API de Carteiras (Wallets):
+    - [✅] POST /api/wallets - Criar
+    - [✅] GET /api/wallets - Listar
+    - [✅] GET /api/wallets/:id - Detalhar
+    - [✅] PUT /api/wallets/:id - Atualizar
+    - [✅] DELETE /api/wallets/:id - Deletar
+  - API de Cartões de Crédito (CreditCards):
+    - \[ ] CRUD completo (Criar, Listar, Detalhar, Atualizar, Deletar). (Nosso próximo foco!)
+  - API de Categorias (Categories):
+    - \[ ] CRUD para categorias personalizadas (Criar, Listar do usuário + sistema, Atualizar, Deletar).
+  - Setup de Implantação do Backend:
+    - \[ ] Escolher e configurar plataforma de hospedagem para o Express API.
+    - \[ ] Configurar pipeline de implantação contínua para o backend.
+    - \[ ] Meta: Ter a API de autenticação e as APIs base implantadas e acessíveis online.
+- Refinamentos de Autenticação:
+  - \[ ] Implementar `req.session.regenerate()` no fluxo de login para segurança adicional contra fixação de sessão.
 
-- Listagem de transações com filtros.
-- Saldos de carteiras e visão de faturas de cartão (conceitual).
-- Gráficos básicos de despesas/receitas por categoria (a ser detalhado).
+⏩ Fase 2: Backend - API de Transações e Lógica de Negócio Principal (A Fazer)
+
+- APIs de Funcionalidades Centrais:
+  - \[ ] API de Compras Parceladas (InstallmentPurchases) - CRUD.
+  - \[ ] API de Regras de Transação Recorrente (RecurringTransactionRules) - CRUD.
+- Lógica de Negócio:
+  - \[ ] Serviço de Geração Automática de Transações Recorrentes.
+  - \[ ] API de Transações (Transactions) - CRUD completo, com filtros e lógica para diferentes tipos/status.
+  - \[ ] Lógica de Compartilhamento de Conta (MVP - acesso compartilhado para usuários alpha).
+- Melhorias de Carteira:
+  - \[ ] API para Arquivamento de Carteiras (marcar/desmarcar isArchived).
+- Meta: API completa do backend implantada e funcional, pronta para ser consumida pelo frontend.
+
+⏩ Fase 3: Frontend (PWA React/TS + Shadcn/UI) - Estrutura, Autenticação e Implantação Inicial do Frontend (A Fazer)
+
+- \[ ] Configuração inicial do projeto Client (Vite, TS, Shadcn/UI), Manifest PWA.
+- \[ ] Setup de Implantação Contínua do Frontend (ex: Vercel).
+- \[ ] Layout Principal (Navegação, Header, Sidebar, etc.).
+- \[ ] Página e Fluxo de Login (consumindo a API do backend implantada).
+- \[ ] Gerenciamento de estado de autenticação no client.
+- \[ ] Roteamento protegido.
+- Meta: Usuários alpha conseguem fazer login em uma versão online do Dindinho (PWA e API implantadas).
+
+⏩ Fase 4: Frontend (PWA React/TS + Shadcn/UI) - Funcionalidades Principais (A Fazer)
+
+- Telas de Gerenciamento (CRUD):
+  - \[ ] Carteiras.
+  - \[ ] Cartões de Crédito.
+  - \[ ] Categorias personalizadas.
+- Registro e Gerenciamento de Transações:
+  - \[ ] Formulários para registrar Receitas, Despesas e Transferências.
+  - \[ ] Interface para registrar Compras Parceladas.
+  - \[ ] Interface para criar e gerenciar Regras de Transações Recorrentes.
+  - \[ ] Interface para visualizar e "confirmar/pagar" transações recorrentes.
+- Visualização e Análise:
+  - \[ ] Dashboard/Visão Geral.
+  - \[ ] Listagem detalhada de Transações com filtros.
+  - \[ ] Visualizações de Dados (Tabelas e Gráficos básicos).
+  - \[ ] Tratamento de Reembolsos (entrada manual de receita).
+    Melhorias de Carteira:
+  - \[ ] Interface para Arquivar/Desarquivar Carteiras e visualizar carteiras arquivadas.
+  - \[ ] Implementar avisos e confirmações robustas no frontend ao deletar carteiras com transações.
+    Meta: Todas as funcionalidades do MVP implementadas no frontend e backend, com implantações contínuas para validação.
+
+⏩ Fase 5: Testes Alpha Integrados, Refinamento e Lançamento MVP (A Fazer)
+
+- \[ ] Testes intensivos do MVP completo pelos dois usuários alpha na versão implantada e integrada.
+- \[ ] Coleta de feedback contínuo e realização de ajustes finos.
+- \[ ] Documentação básica para os usuários alpha (se necessário).
+- \[ ] Preparação para o uso "oficial" e contínuo do MVP pelos alpha testers.
 
 ## 🌱 Futuro do Projeto (Pós-MVP)
 
