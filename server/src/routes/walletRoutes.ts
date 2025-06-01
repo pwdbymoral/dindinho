@@ -5,6 +5,7 @@ import {
   getWallets,
   getWalletById,
   updateWallet,
+  deleteWallet,
 } from '../controllers/walletController.js';
 
 const router: Router = express.Router();
@@ -15,5 +16,6 @@ router.post('/', createWallet);
 router.get('/', getWallets);
 router.get('/:id', getWalletById);
 router.put('/:id', updateWallet);
+router.delete('/:id', deleteWallet);
 
 export default router;

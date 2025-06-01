@@ -206,4 +206,43 @@ export const updateWallet = async (
     next(error);
   }
 };
-// TODO: Implementar deleteWallet
+
+export const deleteWallet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.session.userId;
+    const walletId = parseInt(req.params.id, 10);
+
+    if (isNaN(walletId)) {
+      return res.status(400).json({ message: 'ID da carteira inválido.' });
+    }
+    if (!userId) {
+      return res.status(401).json({ message: 'Usuário não autenticado.' });
+    }
+
+    const wallet = await prisma.wallet.findUnique({
+      where: { id: walletId },
+    });
+
+    if (!wallet) {
+      return res.status(404).json({ message: 'Carteira não encontrada.' });
+    }
+
+    if (wallet.userId !== userId) {
+      return res
+        .status(403)
+        .json({ message: 'Acesso negado: esta carteira não pertence a você.' });
+    }
+
+    await prisma.wallet.delete({
+      where: { id: walletId },
+    });
+
+    return res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
