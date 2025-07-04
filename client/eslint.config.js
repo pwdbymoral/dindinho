@@ -1,4 +1,4 @@
-import rootConfig from '../../eslint.config.mjs';
+import rootConfig from '../eslint.config.mjs';
 
 import globals from 'globals';
 import eslintPluginReact from 'eslint-plugin-react';
