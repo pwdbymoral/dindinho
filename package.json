@@ -7,10 +7,12 @@
     "server"
   ],
   "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "start": "turbo run start",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,prisma}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,prisma}\"",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -25,6 +27,7 @@
     "lint-staged": "^16.1.0",
     "prettier": "^3.5.3",
     "prettier-plugin-prisma": "^5.0.0",
+    "turbo": "^2.5.4",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.33.0"
   },

@@ -7,7 +7,9 @@
     "start": "node ./dist/server.js",
     "build": "tsc",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'node -r dotenv/config --loader ts-node/esm src/server.ts'",
-    "prisma:seed": "node -r dotenv/config --loader ts-node/esm prisma/seed.ts"
+    "prisma:seed": "node -r dotenv/config --loader ts-node/esm prisma/seed.ts",
+    "lint": "eslint src/ --ext .ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@libsql/client": "^0.15.8",
